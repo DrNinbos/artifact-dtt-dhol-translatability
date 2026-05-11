@@ -1,12 +1,4 @@
-# Artifact for "Incremental Forward Reasoning for White-Box Proof Search"
-
-This is the artifact for the paper
-
-    Incremental Forward Reasoning for White-Box Proof Search
-
-to be published at TACAS 2026.
-
-The artifact is available at <https://doi.org/10.5281/zenodo.18188520>.
+# Artifact for checking translatability of MathLib Theorems regarding a DTT to DHOL translation
 
 ## Building
 
@@ -30,8 +22,4 @@ cp results-natural.tar results-synth.tar out/
 
 ## Acknowledgements
 
-The natural benchmark is based on [a
-benchmark](https://github.com/PratherConid/lean-auto-artifact) for the
-paper [Lean-Auto: An Interface Between Lean 4 and Automated Theorem
-Provers](https://link.springer.com/chapter/10.1007/978-3-031-98682-6_10) by
-Yicheng Qian, Joshua Clune, Clark Barrett and Jeremy Avigad.
+Evaluation setup used is by Jannis Limperg and Xavier Généreux for ["Incremental Forward Reasoning for White-Box Proof Search"](https://github.com/JLimperg/artifact-aesop-forward).
