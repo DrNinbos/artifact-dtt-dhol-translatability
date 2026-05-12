@@ -1,5 +1,6 @@
 import Eval.EvalModule
 import Eval.OS
+import Eval.FragmentCheck
 
 namespace EvalAuto
 
@@ -44,7 +45,7 @@ def evalTacticsAtMathlibHumanTheorems (config : EvalTacticOnMathlibConfig) : Cor
     let logPath := config.resultFolder ++ extraLogPath
     let validThms := (allTally.get? mm).getD #[]
     NameArray.save validThms (logPath ++ ".name")
-    let ef ← evalFile mm validThms logPath config
+    let ef ← evalFile mm logPath
     let evalProc ← EvalProc.create "bash" #[]
     if let .some mlimit := config.memoryLimitKb then
       evalProc.stdin.putStrLn s!"ulimit -v {mlimit}"
@@ -70,47 +71,15 @@ where
       | .none => running' := running'.push (mm, proc)
     return running'
   evalFile
-    (mm : Name) (validThms : Array Name)
-    (logPath : String) (config : EvalTacticOnMathlibConfig) : CoreM String := do
-    let lb := "{"
-    let rb := "}"
-    let thmsStrs : List String :=
-      match validThms.toList.getLast? with
-      | .some last =>
-        validThms.toList.dropLast.map (fun n => s!"  {repr n},") ++ [s!"  {repr last}"]
-      | .none => []
-    let nonterms := config.nonterminates
-    let nontermsStrs : List String :=
-      match nonterms.toList.getLast? with
-      | .some last =>
-        nonterms.toList.dropLast.map (fun n => s!"  {repr n},") ++ [s!"  {repr last}"]
-      | .none => []
-    let tacsStr := String.intercalate ", " (config.tactics.map (fun tac => s!"({repr tac})")).toList
-    let allImportedModules := Std.HashSet.ofArray (← getEnv).allImportedModuleNames
-    if ! allImportedModules.contains `Aesop then
-      throwError "{decl_name%} :: Cannot find module `Aesop`"
+    (mm : Name)
+    (logPath : String) : CoreM String := do
     let lines := #[
         s!"import {mm}",
-        "import Eval.EvalModule",
-        "import Aesop",
+        "import Eval.FragmentCheck",
         "",
         "open Lean EvalAuto",
         "",
-        "def humanThms : Std.HashSet Name := Std.HashSet.ofList ["
-      ] ++ thmsStrs ++ #[
-        "]",
-        "",
-        "def nonterms : Array (RegisteredTactic × Name) := #["
-      ] ++ nontermsStrs ++ #[
-        "]",
-        "",
-        "def action : CoreM Unit := do",
-        s!"  let _ ← evalTacticsAtModule ({repr mm}) (fun ci => humanThms.contains ci.name)",
-        s!"    {lb} timeout? := {config.timeout?}, maxHeartbeats := {config.maxHeartbeats}, tactics := #[{tacsStr}],",
-        s!"      logFile := {repr (logPath ++ ".log")}, resultFile := {repr (logPath ++ ".result")}, aesopStatsPrefix := {repr (logPath ++ ".aesopstats")},",
-        s!"      nonterminates := nonterms, repetitions := {config.repetitions} {rb}",
-        "",
-        "#eval action"
+        s!"#eval fetchMathlibTheorems' {mm} {repr (logPath ++ ".log")} {repr (logPath ++ ".result")}"
       ]
     return String.intercalate "\n" lines.toList
 
