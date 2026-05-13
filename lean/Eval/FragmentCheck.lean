@@ -5,6 +5,8 @@ import Lean.ProjFns
 import Lean.Server.Utils
 import Std.Time.DateTime.Timestamp
 
+namespace EvalAuto
+
 open Lean Lean.Expr Lean.Meta
 
 def mathlibModules : CoreM (Array Name) := do
@@ -337,3 +339,5 @@ def fetchMathlibTheorems' (moduleName : Name) (logFile : Option String := .none)
             and has signature {signature} with types {tyExprs} where {tyLogs}"
         if let .some fhandle := resultFileHandle? then
           fhandle.putStrLn s!"{info.name} : {b && b'}"
+
+end EvalAuto
