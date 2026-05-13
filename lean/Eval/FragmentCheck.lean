@@ -5,7 +5,7 @@ import Lean.ProjFns
 import Lean.Server.Utils
 import Std.Time.DateTime.Timestamp
 
-namespace EvalAuto
+namespace EvalFragment
 
 open Lean Lean.Expr Lean.Meta
 
@@ -340,4 +340,4 @@ def fetchMathlibTheorems' (moduleName : Name) (logFile : Option String := .none)
         if let .some fhandle := resultFileHandle? then
           fhandle.putStrLn s!"{info.name} : {b && b'}"
 
-end EvalAuto
+end EvalFragment

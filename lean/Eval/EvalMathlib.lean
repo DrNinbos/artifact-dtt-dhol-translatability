@@ -77,7 +77,7 @@ where
         s!"import {mm}",
         "import Eval.FragmentCheck",
         "",
-        "open Lean EvalAuto",
+        "open Lean EvalAuto EvalFragment",
         "",
         s!"#eval fetchMathlibTheorems' {mm} {repr (logPath ++ ".log")} {repr (logPath ++ ".result")}"
       ]
