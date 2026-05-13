@@ -278,12 +278,12 @@ partial def splitIntros (e : Expr) : ((List (Name × Expr × BinderInfo)) × Exp
     | e, xs =>
       (xs, e)
 
-def fetchMathlibTheorems' (moduleName : Name) (logFile : Option String := .none) (resultFile : Option String := .none) : MetaM Unit := do
-  let logFileHandle? : Option IO.FS.Handle ← logFile.mapM (fun fname => IO.FS.Handle.mk fname .write)
-  let resultFileHandle? : Option IO.FS.Handle ← resultFile.mapM (fun fname => IO.FS.Handle.mk fname .write)
-  if let .some fhandle := logFileHandle? then
-    fhandle.putStrLn s!"Start time : {← Std.Time.Timestamp.now}"
-    fhandle.putStrLn s!"Eval Module : {moduleName}"
+def fetchMathlibTheorems' (moduleName : Name) (logFile : String) (resultFile : String) : MetaM Unit := do
+  let logFileHandle? : IO.FS.Handle ← IO.FS.Handle.mk logFile .write
+  let resultFileHandle? : IO.FS.Handle ← IO.FS.Handle.mk resultFile .write
+  logFileHandle?.putStrLn s!"Start time : {← Std.Time.Timestamp.now}"
+  logFileHandle?.putStrLn s!"Eval Module : {moduleName}"
+  logFileHandle?.flush
   let infos ← allHumanTheoremsFromPackage moduleName
   for (info, tys) in infos do
     let mut signature := List.map (Lean.ToExpr.toExpr) info.type.getUsedConstants.toList
@@ -319,25 +319,25 @@ def fetchMathlibTheorems' (moduleName : Name) (logFile : Option String := .none)
           | .inr b => tyLogs := tyLogs.append #[s!"{tyRec.name} is {b}"]
     match ctxResult, result with
       | .inl s, .inl s' =>
-        if let .some fhandle := logFileHandle? then
-          fhandle.putStrLn s!"{info.name} has error {s} in context and error {s'} in body"
-        if let .some fhandle := resultFileHandle? then
-          fhandle.putStrLn s!"{info.name} : false"
+        logFileHandle?.putStrLn s!"{info.name} has error {s} in context and error {s'} in body"
+        logFileHandle?.flush
+        resultFileHandle?.putStrLn s!"{info.name} : false"
+        resultFileHandle?.flush
       | .inl s, .inr b =>
-        if let .some fhandle := logFileHandle? then
-          fhandle.putStrLn s!"{info.name} has error {s} in context, body is {b}"
-        if let .some fhandle := resultFileHandle? then
-          fhandle.putStrLn s!"{info.name} : false"
+        logFileHandle?.putStrLn s!"{info.name} has error {s} in context, body is {b}"
+        logFileHandle?.flush
+        resultFileHandle?.putStrLn s!"{info.name} : false"
+        resultFileHandle?.flush
       | .inr b, .inl s =>
-        if let .some fhandle := logFileHandle? then
-          fhandle.putStrLn s!"{info.name}'s context is {b} and has error {s} in body"
-        if let .some fhandle := resultFileHandle? then
-          fhandle.putStrLn s!"{info.name} : false"
+        logFileHandle?.putStrLn s!"{info.name}'s context is {b} and has error {s} in body"
+        logFileHandle?.flush
+        resultFileHandle?.putStrLn s!"{info.name} : false"
+        resultFileHandle?.flush
       | .inr b, .inr b' =>
-        if let .some fhandle := logFileHandle? then
-          fhandle.putStrLn s!"{info.name} : {univMonomorphicType} is {b} ⊢ {b'} \
-            and has signature {signature} with types {tyExprs} where {tyLogs}"
-        if let .some fhandle := resultFileHandle? then
-          fhandle.putStrLn s!"{info.name} : {b && b'}"
+        logFileHandle?.putStrLn s!"{info.name} : {univMonomorphicType} is {b} ⊢ {b'} \
+          and has signature {signature} with types {tyExprs} where {tyLogs}"
+        logFileHandle?.flush
+        resultFileHandle?.putStrLn s!"{info.name} : {b && b'}"
+        resultFileHandle?.flush
 
 end EvalFragment
