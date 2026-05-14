@@ -79,7 +79,7 @@ where
         "",
         "open Lean EvalFragment",
         "",
-        s!"#eval fetchMathlibTheorems' {mm} {repr (logPath ++ ".log")} {repr (logPath ++ ".result")}"
+        s!"#eval fetchMathlibTheorems' {repr mm} {repr (logPath ++ ".log")} {repr (logPath ++ ".result")}"
       ]
     return String.intercalate "\n" lines.toList
 
