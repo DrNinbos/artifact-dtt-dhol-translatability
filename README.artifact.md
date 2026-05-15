@@ -1,39 +1,14 @@
-# Artifact for "Incremental Forward Reasoning for White-Box Proof Search"
+# Artifact for checking translatability of MathLib Theorems regarding a DTT to DHOL translation
 
-Artifact for paper #1583 at TACAS 2026.
+Artifact for checking the translatability of MathLib Theorems regarding a DTT to DHOL translation.
 
 We claim the available and reusable badge for this artifact.
-
-## Overview
-
-This artifact can be used to reproduce the experimental results of our paper
-
-    Incremental Forward Reasoning for White-Box Proof Search
-
-to be published at TACAS 2026.
-
-It contains:
-
-- A recent version of Aesop that includes both our new, incremental
-  forward reasoning implementation and the old, naive implementation.
-- A synthetic benchmark that evaluates the performance of our incremental
-  forward reasoning implementation against the previous, naive implementation
-  on a few custom test cases.
-- A natural benchmark that evaluates the performance on human-written Mathlib
-  theorems with simulated perfect premise selection.
 
 ## Requirements
 
 The artifact can be run on X86 and ARM64 machines.
 
-The synthetic benchmark can be run on commodity hardware.
-
-The natural benchmark evaluates different tactic configurations on over 200k
-Mathlib theorems. It can technically be run on commodity hardware, but we
-recommend using a large server to keep the evaluation time reasonable. We
-used an m8g.metal-48xl AWS instance with 192 CPU cores, on which the benchmark
-takes around 6h. The benchmark requires 4GB of RAM per core; the number of
-cores used is configurable.
+The natural benchmark checks all MathLib theorems regarding translatability.
 
 ## Structure and Content
 
@@ -41,8 +16,6 @@ The artifact contains:
 
 - `artifact-x86.tar`: X86 Docker image
 - `artifact-arm64.tar`: ARM64 Docker image
-- `results-natural.tar`: results from the natural benchmark reported in the paper
-- `results-synth.tar`: results from the synthetic benchmark reported in the paper
 
 The Docker images are used to run both benchmarks. Their `/home` folders
 contain:
@@ -76,85 +49,13 @@ docker load -i artifact-arm64.tar
 
 Docker may require `sudo` throughout.
 
-### Task: Synthetic Benchmark Smoke Test
+### Task: Benchmark Smoke Test
 
 ```bash
-docker run --name syn-smoke aesop-forward-artifact /home/test_scripts/synth_benchmark.sh
+docker run --init --name smoke aesop-forward-artifact /home/test_scripts/all_experiments.sh --nMod 4
 ```
 
-This command executes the synthetic benchmark. It should finish within about 10 min 
-with output such as
-
-```
-Running benchmarks in: /home/lean
-Results will be saved to: /home
-
-Backed up lakefile.lean
-========================================================================
-RUNNING BENCHMARKS WITH precompileModules = false
-========================================================================
---- Setting precompileModules = false in lakefile.lean ---
-Updated lakefile.lean
---- Deleting .oleans ---
---- Building dependencies ---
-Build completed successfully (176 jobs).
-Build completed successfully (174 jobs).
-Build completed successfully (174 jobs).
-this took 13.755 seconds
---- Running Benchmark: Transitivity ---
-this took 214.694 seconds
---- Running Benchmark: Depth ---
-this took 80.594 seconds
---- Generating LaTeX File (/home/bench-results-precomp-false/benchmark_results.tex) ---
---- Compiling PDF ---
-Done! Generated /home/bench-results-precomp-false/benchmark_results.pdf
-
-========================================================================
-RUNNING BENCHMARKS WITH precompileModules = true
-========================================================================
---- Setting precompileModules = true in lakefile.lean ---
-Updated lakefile.lean
---- Deleting .oleans ---
---- Building dependencies ---
-Build completed successfully (627 jobs).
-Build completed successfully (625 jobs).
-Build completed successfully (625 jobs).
-this took 23.758 seconds
---- Running Benchmark: Transitivity ---
-this took 211.472 seconds
---- Running Benchmark: Depth ---
-this took 36.171 seconds
---- Generating LaTeX File (/home/bench-results-precomp-true/benchmark_results.tex) ---
---- Compiling PDF ---
-Done! Generated /home/bench-results-precomp-true/benchmark_results.pdf
-
-========================================================================
-ALL BENCHMARKS COMPLETE
-========================================================================
-Results saved in:
-  - /home/bench-results-precomp-false/
-  - /home/bench-results-precomp-true/
-
-Restored original lakefile.lean
-```
-
-Benchmark results can be copied out of the container with
-
-```
-docker cp synth-smoke:/home/bench-results-precomp-true bench-results-precomp-true
-docker cp synth-smoke:/home/bench-results-precomp-false bench-results-precomp-false
-```
-
-Each directory should contain a text file and a tex file.
-
-
-### Task: Natural Benchmark Smoke Test
-
-```bash
-docker run --init --name nat-smoke aesop-forward-artifact /home/test_scripts/all_experiments.sh --nMod 4
-```
-
-This command executes the natural benchmark for only four (rather than all)
+This command executes the benchmark for only four (rather than all)
 Mathlib modules. The `--init` option may be necessary to correctly reap zombie
 processes. The command should finish within 20-30min with output such as
 
@@ -187,29 +88,10 @@ Note: the synthetic and natural benchmarks must be run in different Docker
 containers since the synthetic benchmark clears certain Mathlib build products
 that are used by the natural benchmark.
 
-### Task: Reproduce Synthetic Benchmark
-
-We run essentially the same command as for the synthetic benchmark smoke test.
+### Task: Reproduce Benchmark
 
 ```bash
-docker run --name syn aesop-forward-artifact /home/test_scripts/synth_benchmark.sh
-```
-
-Benchmark results can be copied out of the container with
-
-```
-docker cp synth:/home/bench-results-precomp-true bench-results-precomp-true
-docker cp synth:/home/bench-results-precomp-false bench-results-precomp-false
-```
-
-To produce the graphs used in the paper, compile the tex file in each directory.
-The upper graph is for the Transitivity benchmark, the lower one is for the
-Depth benchmark
-
-### Task: Reproduce Natural Benchmark
-
-```bash
-docker run --init --detach --name nat aesop-forward-artifact /home/test_scripts/all_experiments.sh
+docker run --init --detach --name bench aesop-forward-artifact /home/test_scripts/all_experiments.sh
 ```
 
 This command runs the full natural benchmark, which takes around 6h on an
@@ -250,27 +132,12 @@ The `all_experiments.sh` script accepts the following flags:
 - `--heartbeats`: per-tactic heartbeat limit. This is a deterministic timeout
   mechanism based on memory allocations. Default: 200000 (Lean's default).
 
-### Task: Inspect Forward Reasoning Implementation
-
-```bash
-docker run -it --name inspect aesop-forward-artifact bash
-```
-
-This command starts a bash shell from which you can explore the artifact.
-The Aesop code being evaluated is in
-
-    /home/lean/.lake/packages/aesop
-
-It is also available as commit `fa78cf032194308a950a264ed87b422a2a7c1c6c` at
-
-https://github.com/leanprover-community/aesop/tree/fa78cf032194308a950a264ed87b422a2a7c1c6c
-
 ### Cleanup
 
 Remove Docker containers:
 
 ```bash
-docker container rm [syn-smoke nat-smoke ...]
+docker container rm [smoke bench]
 ```
 
 To list all containers:
@@ -287,8 +154,4 @@ docker image rm aesop-forward-artifact
 
 ## Acknowledgements
 
-The natural benchmark is based on [a
-benchmark](https://github.com/PratherConid/lean-auto-artifact) for the
-paper [Lean-Auto: An Interface Between Lean 4 and Automated Theorem
-Provers](https://link.springer.com/chapter/10.1007/978-3-031-98682-6_10) by
-Yicheng Qian, Joshua Clune, Clark Barrett and Jeremy Avigad.
+Evaluation setup used is by Jannis Limperg and Xavier Généreux for ["Incremental Forward Reasoning for White-Box Proof Search"](https://github.com/JLimperg/artifact-aesop-forward).
