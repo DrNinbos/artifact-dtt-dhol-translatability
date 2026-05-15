@@ -291,10 +291,11 @@ def fetchMathlibTheorems' (moduleName : Name) (logFile : String) (resultFile : S
     let univParams := info.levelParams
     let concreteLevels := List.replicate univParams.length (Lean.Level.ofNat 0)
     let univMonomorphicType := (info.type.instantiateLevelParams univParams concreteLevels)
-    let (ctx,stmt) := splitIntros univMonomorphicType
     let ctxResult ← checkInFragmentPreCtx univMonomorphicType
     let result ← checkInFragmentPreUnderCtx univMonomorphicType
     let mut tyLogs := #[]
+    let mut sigBool := true
+    let mut reasons := #[]
     for ty in tys do
       let univParamsTy := ty.levelParams
       let concreteLevelsTy := List.replicate univParamsTy.length (Lean.Level.ofNat 0)
@@ -302,7 +303,11 @@ def fetchMathlibTheorems' (moduleName : Name) (logFile : String) (resultFile : S
       let sigRes ← checkInFragmentPreSig univMonomorphicType
       match sigRes with
         | .inl s => tyLogs := tyLogs.append #[s!"{ty.name} has error {s}"]
-        | .inr b => tyLogs := tyLogs.append #[s!"{ty.name} is {b}"]
+        | .inr b =>
+          tyLogs := tyLogs.append #[s!"{ty.name} is {b}"]
+          sigBool := sigBool && b
+          if !b then
+            reasons := reasons.append #[s!"{ty.name}"]
       if ty.isInductive then
         let recName := (ty.name.append `rec)
         let .some tyRec := (← getEnv).find? recName
@@ -316,7 +321,9 @@ def fetchMathlibTheorems' (moduleName : Name) (logFile : String) (resultFile : S
         let recRes ← checkInFragmentPreSig univMonomorphicTypeRec
         match recRes with
           | .inl s => tyLogs := tyLogs.append #[s!"{tyRec.name} has error {s}"]
-          | .inr b => tyLogs := tyLogs.append #[s!"{tyRec.name} is {b}"]
+          | .inr b =>
+            tyLogs := tyLogs.append #[s!"{tyRec.name} is {b}"]
+            sigBool := sigBool && b
     match ctxResult, result with
       | .inl s, .inl s' =>
         logFileHandle?.putStrLn s!"{info.name} has error {s} in context and error {s'} in body"
@@ -337,7 +344,7 @@ def fetchMathlibTheorems' (moduleName : Name) (logFile : String) (resultFile : S
         logFileHandle?.putStrLn s!"{info.name} : {univMonomorphicType} is {b} ⊢ {b'} \
           and has signature {signature} with types {tyExprs} where {tyLogs}"
         logFileHandle?.flush
-        resultFileHandle?.putStrLn s!"{info.name} : {b && b'}"
+        resultFileHandle?.putStrLn s!"{info.name} : {b && b'}, signature : {sigBool} {reasons}"
         resultFileHandle?.flush
 
 end EvalFragment
