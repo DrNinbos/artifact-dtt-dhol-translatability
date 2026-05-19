@@ -87,9 +87,11 @@ printf "tactics.sh done: %(%s)T\n"
 
 # Gather results
 mkdir -p /home/results
-#echo "Gathering results ..."
+mkdir -p /home/results/Mathlib
+echo "Gathering results ..."
 #/home/venv/bin/python /home/analysis/collect_results.py "$repo_path/EvalTactics" "/home/results"
-#printf "Done: %(%s)T\n"
+/home/venv/bin/python /home/analysis/results-as-csvs.py "$repo_path/EvalTactics/Mathlib" "/home/results"
+printf "Done: %(%s)T\n"
 
 #echo "Gathering Aesop stats ..."
 #/home/venv/bin/python /home/analysis/collect_aesopstats.py "$repo_path/EvalTactics" "/home/results"
