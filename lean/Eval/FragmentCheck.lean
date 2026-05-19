@@ -324,21 +324,23 @@ def fetchMathlibTheorems' (moduleName : Name) (logFile : String) (resultFile : S
           | .inr b =>
             tyLogs := tyLogs.append #[s!"{tyRec.name} is {b}"]
             sigBool := sigBool && b
+            if !b then
+              reasons := reasons.append #[s!"{ty.name}"]
     match ctxResult, result with
       | .inl s, .inl s' =>
         logFileHandle?.putStrLn s!"{info.name} has error {s} in context and error {s'} in body"
         logFileHandle?.flush
-        resultFileHandle?.putStrLn s!"{info.name} : false"
+        resultFileHandle?.putStrLn s!"{info.name} : Error"
         resultFileHandle?.flush
       | .inl s, .inr b =>
         logFileHandle?.putStrLn s!"{info.name} has error {s} in context, body is {b}"
         logFileHandle?.flush
-        resultFileHandle?.putStrLn s!"{info.name} : false"
+        resultFileHandle?.putStrLn s!"{info.name} : Error"
         resultFileHandle?.flush
       | .inr b, .inl s =>
         logFileHandle?.putStrLn s!"{info.name}'s context is {b} and has error {s} in body"
         logFileHandle?.flush
-        resultFileHandle?.putStrLn s!"{info.name} : false"
+        resultFileHandle?.putStrLn s!"{info.name} : Error"
         resultFileHandle?.flush
       | .inr b, .inr b' =>
         logFileHandle?.putStrLn s!"{info.name} : {univMonomorphicType} is {b} ⊢ {b'} \
