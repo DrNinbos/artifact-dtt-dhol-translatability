@@ -101,7 +101,7 @@ echo "Copying allTheorems.txt ..."
 cp "$repo_path/EvalTactics/allTheorems.txt" "/home/results/allTheorems.txt"
 
 echo "Copying results ..."
-cp "$repo_path/EvalTactics/Mathlib" "/home/results/Mathlib"
+cp -r "$repo_path/EvalTactics/Mathlib" "/home/results/Mathlib"
 
 # Analyze results
 #echo "Analyzing results ..."
