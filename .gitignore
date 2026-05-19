@@ -3,3 +3,4 @@ result.zip
 __pycache__
 bench-results-precomp-false
 bench-results-precomp-true
+out/
