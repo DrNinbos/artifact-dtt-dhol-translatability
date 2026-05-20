@@ -34,7 +34,6 @@ def merge_all_csvs(dir : Path, writer):
       merge_all_csvs(p, writer)
     else:
       if p.name.endswith('.csv'):
-        print(p)
         with open(p, 'r', newline='') as csvfile:
           reader = csv.DictReader(csvfile, fieldnames=['Thm_Name', 'Translatability_Stmt', 'Translatability_Sig', 'Reasons_Sig'], delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
           for row in reader:
@@ -42,7 +41,7 @@ def merge_all_csvs(dir : Path, writer):
               writer.writerow({'Thm_Name': row['Thm_Name'], 'Translatability_Stmt': row['Translatability_Stmt'], 'Translatability_Sig': row['Translatability_Sig'], 'Reasons_Sig': row['Reasons_Sig']})
 
 results_as_csvs(data_dir)
-with open(data_dir / Path('results.csv'), 'w', newline='') as resultfile:
+with open(output_dir / Path('results.csv'), 'w', newline='') as resultfile:
   writer = csv.DictWriter(resultfile, fieldnames=['Thm_Name', 'Translatability_Stmt', 'Translatability_Sig', 'Reasons_Sig'], delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
   writer.writeheader()
   merge_all_csvs(data_dir, writer)
