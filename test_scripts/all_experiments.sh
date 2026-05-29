@@ -12,7 +12,7 @@ flags=(
   [timeT]="none"
   [mem]="none"
   [threads]="1"
-  [repetitions]="3"
+  [repetitions]="1"
   [heartbeats]="200000"
 )
 
