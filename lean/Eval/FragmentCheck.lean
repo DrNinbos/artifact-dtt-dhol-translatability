@@ -394,8 +394,4 @@ def fetchMathlibTheorems' (moduleName : Name) (logFile : String) (resultFile : S
         resultFileHandle?.putStrLn s!"{info.name} : true, signature : {sigBool} {reasons}"
         resultFileHandle?.flush
 
-#eval do fetchMathlibTheorems' `Eval.tt "tt.log" "tt.result"
-
-#check Eq.rec
-
 end EvalFragment

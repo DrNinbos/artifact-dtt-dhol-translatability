@@ -14,10 +14,10 @@ The natural benchmark checks all MathLib theorems regarding translatability.
 
 The artifact contains:
 
-- `artifact-x86.tar`: X86 Docker image
-- `artifact-arm64.tar`: ARM64 Docker image
+- `artifact-x86.tar`: X86 Podman image
+- `artifact-arm64.tar`: ARM64 Podman image
 
-The Docker images are used to run both benchmarks. Their `/home` folders
+The Podman images are used to run both benchmarks. Their `/home` folders
 contain:
 
 - `lean/`: evaluation harness for the natural benchmark.
@@ -39,20 +39,20 @@ contain:
 
 ### Preparation
 
-Load the Docker image for your machine's architecture:
+Load the Podman image for your machine's architecture:
 
 ```bash
-docker load -i artifact-x86.tar
+podman load -i artifact-x86.tar
 # or
-docker load -i artifact-arm64.tar
+podman load -i artifact-arm64.tar
 ```
 
-Docker may require `sudo` throughout.
+Podman may require `sudo` throughout.
 
 ### Task: Benchmark Smoke Test
 
 ```bash
-docker run --init --name smoke aesop-forward-artifact /home/test_scripts/all_experiments.sh --nMod 4
+podman run --init --name smoke dtt-dhol-artifact /home/test_scripts/all_experiments.sh --nMod 4
 ```
 
 This command executes the benchmark for only four (rather than all)
@@ -78,20 +78,20 @@ Done: 1767899604
 Benchmark results and analysis can be copied out of the container with
 
 ```bash
-docker cp nat-smoke:/home/results results
+podman cp nat-smoke:/home/results results
 ```
 
 The `results` directory should contain two Parquet files, a file `analysis.txt`
 and a `plots` directory containing various images.
 
-Note: the synthetic and natural benchmarks must be run in different Docker
+Note: the synthetic and natural benchmarks must be run in different Podman
 containers since the synthetic benchmark clears certain Mathlib build products
 that are used by the natural benchmark.
 
 ### Task: Reproduce Benchmark
 
 ```bash
-docker run --init --detach --name bench aesop-forward-artifact /home/test_scripts/all_experiments.sh
+podman run --init --detach --name bench dtt-dhol-artifact /home/test_scripts/all_experiments.sh
 ```
 
 This command runs the full natural benchmark, which takes around 6h on an
@@ -99,7 +99,7 @@ m8g.metal-48xl AWS instance with 192 processors. Once it has finished, results
 can be extracted with
 
 ```bash
-docker cp nat-smoke:/home/results results
+podman cp nat-smoke:/home/results results
 ```
 
 The data in the `results` directory should match (within reasonable tolerances)
@@ -134,22 +134,22 @@ The `all_experiments.sh` script accepts the following flags:
 
 ### Cleanup
 
-Remove Docker containers:
+Remove Podman containers:
 
 ```bash
-docker container rm [smoke bench]
+podman container rm [smoke bench]
 ```
 
 To list all containers:
 
 ```bash
-docker container ls -a
+podman container ls -a
 ```
 
 Once all containers are deleted, the image can be removed:
 
 ```bash
-docker image rm aesop-forward-artifact
+podman image rm dtt-dhol-artifact
 ```
 
 ## Acknowledgements

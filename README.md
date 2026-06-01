@@ -2,15 +2,15 @@
 
 ## Building
 
-Build the Docker image. This step needs to be performed twice, once on an
+Build the Podman image. This step needs to be performed twice, once on an
 X86 machine and once on an ARM64 machine.
 
 ```bash
-docker build . -t aesop-forward-artifact
+podman build . -t dtt-dhol-artifact
 # on x86
-docker save aesop-forward-artifact -o out/artifact-x86.tar
+podman dtt-dhol-artifact -o out/artifact-x86.tar
 # or, on arm64
-docker save aesop-forward-artifact -o out/artifact-arm64.tar
+podman save dtt-dhol-artifact -o out/artifact-arm64.tar
 ```
 
 Copy all remaining data to `out/`:
