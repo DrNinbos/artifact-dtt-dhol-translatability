@@ -4,7 +4,6 @@ import Lean.Meta.Basic
 import Lean.ProjFns
 import Lean.Server.Utils
 import Std.Time.DateTime.Timestamp
-import Eval.tt
 
 namespace EvalFragment
 
