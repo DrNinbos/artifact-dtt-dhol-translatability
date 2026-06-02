@@ -363,7 +363,7 @@ def fetchMathlibTheorems' (moduleName : Name) (logFile : String) (resultFile : S
         match recRes with
           | .inl s =>
             tyLogs := tyLogs.append #[s!"{tyRec.name} has error {s}"]
-            reasons := reasons.append #[s!"{ty.name}"]
+            reasons := reasons.append #[s!"{tyRec.name}"]
             sigBool := false
           | .inr _ =>
             tyLogs := tyLogs.append #[s!"{tyRec.name} is true"]
