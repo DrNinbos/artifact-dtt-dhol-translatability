@@ -266,6 +266,14 @@ partial def checkInFragmentPreSig (e : Expr) : MetaM (String ⊕ Unit) := do
       | some 1 => withLocalDecl x b (.sort 1) fun fvar =>
         checkInFragmentPreSigRest (β.instantiate1 fvar)
       | some n => return .inl s!"Sort of level {n} too large"
+    | .forallE x (.app (.const ``outParam _) (.sort ℓ)) β b =>
+      match ℓ.toNat with
+      | none => return .inl s!"Weird sort {ℓ} not supported"
+      | some 0 => withLocalDecl x b (.sort 0) fun fvar =>
+        checkInFragmentPreSigRest (β.instantiate1 fvar)
+      | some 1 => withLocalDecl x b (.sort 1) fun fvar =>
+        checkInFragmentPreSigRest (β.instantiate1 fvar)
+      | some n => return .inl s!"Sort of level {n} too large"
     | .forallE x α β b => do
       match (← checkInFragmentPre α) with
       | .inl s =>
@@ -278,6 +286,8 @@ partial def checkInFragmentPreSig (e : Expr) : MetaM (String ⊕ Unit) := do
       | some 0 => return .inr ()
       | some 1 => return .inr ()
       | some n => return .inl s!"Sort of level {n} too large"
+    | .app (.const ``outParam _) e2 =>
+      checkInFragmentPreSigRest e2
     | e => checkInFragmentPre e
 
 partial def checkInFragmentPreUnderCtx :
