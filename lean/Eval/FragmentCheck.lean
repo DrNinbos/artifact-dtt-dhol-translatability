@@ -82,49 +82,6 @@ partial def checkInFragmentPre : Expr → MetaM (String ⊕ Unit)
     | none => return .inl s!"Weird sort {ℓ} not supported"
     | some 0 => return .inr ()
     | some n => return .inl s!"Sort of level {n} too large"
-  -- | .app (.app (.app (.const (``Eq) _) α) a) b => do
-  --   match ← inferType α with
-  --     | .sort ℓ =>
-  --       match ℓ.toNat with
-  --         | none => return .inl s!"Weird sort {ℓ} not supported"
-  --         | some 0 => return .inr false
-  --         | some 1 => return .inr ()
-  --         | some _ =>
-  --           let ac ← checkInFragmentPre a
-  --           let bc ← checkInFragmentPre b
-  --           match ← checkInFragmentPre α with
-  --             | .inl sα => match ac with
-  --               | .inl sa => match bc with
-  --                 | .inl sb => return .inl s!"Eq[{sα}, {sa}, {sb}]"
-  --                 | .inr bb => return .inl s!"Eq[{sα}, {sa}, {b} is {bb}]"
-  --               | .inr ba => match bc with
-  --                 | .inl sb => return .inl s!"Eq[{sα}, {a} is {ba}, {sb}]"
-  --                 | .inr bb => return .inl s!"Eq[{sα}, {a} is {ba}, {b} is {bb}]"
-  --             | .inr bα => match ac with
-  --               | .inl sa => match bc with
-  --                 | .inl sb => return .inl s!"Eq[{α} is {bα}, {sa}, {sb}]"
-  --                 | .inr bb => return .inl s!"Eq[{α} is {bα}, {sa}, {b} is {bb}]"
-  --               | .inr ba => match bc with
-  --                 | .inl sb => return .inl s!"Eq[{α} is {bα}, {a} is {ba}, {sb}]"
-  --                 | .inr bb => return .inr (bα && ba && bb)
-  --     | _ =>
-  --           let ac ← checkInFragmentPre a
-  --           let bc ← checkInFragmentPre b
-  --           match ← checkInFragmentPre α with
-  --             | .inl sα => match ac with
-  --               | .inl sa => match bc with
-  --                 | .inl sb => return .inl s!"Eq[{sα}, {sa}, {sb}]"
-  --                 | .inr bb => return .inl s!"Eq[{sα}, {sa}, {b} is {bb}]"
-  --               | .inr ba => match bc with
-  --                 | .inl sb => return .inl s!"Eq[{sα}, {a} is {ba}, {sb}]"
-  --                 | .inr bb => return .inl s!"Eq[{sα}, {a} is {ba}, {b} is {bb}]"
-  --             | .inr bα => match ac with
-  --               | .inl sa => match bc with
-  --                 | .inl sb => return .inl s!"Eq[{α} is {bα}, {sa}, {sb}]"
-  --                 | .inr bb => return .inl s!"Eq[{α} is {bα}, {sa}, {b} is {bb}]"
-  --               | .inr ba => match bc with
-  --                 | .inl sb => return .inl s!"Eq[{α} is {bα}, {a} is {ba}, {sb}]"
-  --                 | .inr bb => return .inr (bα && ba && bb)
   | .app e1 e2 => do
     let e1c ← checkInFragmentPre e1
     let e2c ← checkInFragmentPre e2
