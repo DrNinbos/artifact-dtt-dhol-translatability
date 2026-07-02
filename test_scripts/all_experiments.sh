@@ -89,13 +89,8 @@ printf "tactics.sh done: %(%s)T\n"
 mkdir -p /home/results
 mkdir -p /home/results/Mathlib
 echo "Gathering results ..."
-#/home/venv/bin/python /home/analysis/collect_results.py "$repo_path/EvalTactics" "/home/results"
 /home/venv/bin/python /home/analysis/results-as-csvs.py "$repo_path/EvalTactics/Mathlib" "/home/results"
 printf "Done: %(%s)T\n"
-
-#echo "Gathering Aesop stats ..."
-#/home/venv/bin/python /home/analysis/collect_aesopstats.py "$repo_path/EvalTactics" "/home/results"
-#printf "Done: %(%s)T\n"
 
 echo "Copying allTheorems.txt ..."
 cp "$repo_path/EvalTactics/allTheorems.txt" "/home/results/allTheorems.txt"
@@ -103,7 +98,4 @@ cp "$repo_path/EvalTactics/allTheorems.txt" "/home/results/allTheorems.txt"
 echo "Copying results ..."
 cp -r "$repo_path/EvalTactics/Mathlib" "/home/results/Mathlib"
 
-# Analyze results
-#echo "Analyzing results ..."
-#/home/venv/bin/python /home/analysis/analyze.py "/home/results" "/home/results" > "/home/results/analysis.txt"
 printf "Done: %(%s)T\n"
